@@ -1,0 +1,69 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# C extensions
+*.so
+
+# Virtual environment
+env/
+venv/
+.venv/
+ENV/
+
+# Poetry specific
+poetry.lock
+
+# dotenv environment variables file
+.env
+
+# FastAPI and Uvicorn specific
+*.log
+
+# Temporary files and folders
+app/temp/
+app/__pycache__/
+
+# Audio files (if applicable)
+*.wav
+*.mp3
+*.ogg
+
+# Jupyter Notebook checkpoints (if used)
+.ipynb_checkpoints/
+
+# Mac OS specific
+.DS_Store
+
+# IDE specific
+.vscode/
+.idea/
+
+# Python egg files
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Docker
+*.log
+docker-compose.override.yml
+.dockerignore
+
+# Test and coverage files
+.coverage
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+app/tests
+
+# General temporary files
+*.tmp
+*.bak
+*.swp
+*~
