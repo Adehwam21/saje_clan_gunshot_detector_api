@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 from opensoundscape.preprocess.preprocessors import AudioToSpectrogramPreprocessor
 from opensoundscape.torch.models.cnn import Resnet18Binary
+from app.utils import format_gps_data
 from telegram import Bot
 
 # Load environment variables from the .env file
@@ -81,7 +82,7 @@ class GunshotDetector:
         return preprocessor
 
     @staticmethod
-    async def predict_gunshot(file_path):
+    async def predict_gunshot(file_path, gpsData):
         """Perform gunshot prediction and send notification to a Telegram group if detected.
 
         Args:
@@ -114,10 +115,11 @@ class GunshotDetector:
         positive_score = float(scores.iloc[0]['positive'])
         SajeBot = GunshotDetector.bot  # Telegram bot instance
         group_chat_id = GunshotDetector.group_chat_id  # Chat ID for the Telegram group
+        GPS_data = format_gps_data(gpsData)
 
         # If the score indicates a positive gunshot detection, send a message and the audio file
         if positive_score > 0.808802:
-            message = f"Wildlife Rescue Team! I detected a Gunshot. Probability: {round(positive_score * 100, 2)}%"
+            message = f"Wildlife Rescue Team! I detected a Gunshot.\nProbability: {round(positive_score * 100, 2)}%\nDate, Time: {GPS_data['date'], GPS_data['time']}"
             
             # Send a message to the Telegram group
             await SajeBot.send_message(chat_id=group_chat_id, text=message)
@@ -125,6 +127,13 @@ class GunshotDetector:
             # Send the audio file to the Telegram group
             with open(file_path, 'rb') as audio_file:
                 await SajeBot.send_audio(chat_id=group_chat_id, audio=audio_file)
+            
+            await SajeBot.send_location(chat_id = group_chat_id, 
+                                        latitude= GPS_data['lat'], 
+                                        longitude = GPS_data['lng'], 
+                                        horizontal_accuracy= 40, 
+                                        proximity_alert_radius= 40
+                                        )
             
             return message  # Return the message that was sent
         else:

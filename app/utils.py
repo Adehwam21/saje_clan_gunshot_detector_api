@@ -1,5 +1,6 @@
 import shutil
 from pathlib import Path
+from datetime import datetime
 
 # Utility function to save uploaded files temporarily
 def save_temp_file(upload_file):
@@ -27,3 +28,32 @@ def save_temp_file(upload_file):
 
     # Return the path of the temporary directory and the saved file
     return [str(temp_dir), str(temp_file_path)]
+
+
+
+def format_gps_data(gpsData: str):
+    # Split the GPS data string into components
+    gpsData = gpsData.split(",")
+    
+    # Extract latitude, longitude, and timestamp
+    latitude, longitude, timestamp = gpsData[0].strip(), gpsData[1].strip(), gpsData[2].strip()
+
+    # Convert latitude and longitude to floats
+    latitude = float(latitude)
+    longitude = float(longitude)
+    
+    # Convert timestamp (milliseconds) to seconds and format the time
+    timestamp_seconds = int(timestamp) / 1000
+    time_str = datetime.utcfromtimestamp(timestamp_seconds).strftime('%H:%M:%S')
+    
+    # Get the current date
+    current_date = datetime.utcnow().strftime('%Y-%m-%d')
+    
+    # Return the data in a dictionary
+    return {
+        "lat": latitude,
+        "lng": longitude,
+        "date": current_date,
+        "time": time_str
+    }
+

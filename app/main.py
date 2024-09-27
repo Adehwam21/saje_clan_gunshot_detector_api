@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, Header, HTTPException
 from fastapi.responses import JSONResponse
 from app.model.gunshotPredictor import GunshotDetector
 from app.utils import save_temp_file
@@ -27,11 +27,12 @@ async def root():
 
 # Endpoint for gunshot detection
 @app.post("/detect")
-async def detect_gunshot(file: UploadFile = File(...)):
-    """Endpoint to detect gunshots in an uploaded audio file.
+async def detect_gunshot(file: UploadFile = File(...), gps_data: str = Header(None)):
+    """Endpoint to detect gunshots in an uploaded audio file with GPS data.
 
     Args:
         file (UploadFile): The uploaded audio file for detection.
+        gps_data (str): The GPS data passed in the request headers.
     
     Returns:
         dict: A dictionary containing the detection results or an error message.
@@ -40,11 +41,15 @@ async def detect_gunshot(file: UploadFile = File(...)):
         HTTPException: If no gunshot is detected or an error occurs during processing.
     """
     try:
+        # Check if GPS data is provided in the headers
+        if not gps_data:
+            raise HTTPException(status_code=400, detail="GPS Data header not provided.")
+        
         # Save the uploaded file temporarily to disk
         _, sound_file_path = save_temp_file(file)
         
-        # Run gunshot detection on the saved file
-        results = await GunshotDetector.predict_gunshot(sound_file_path)
+        # Run gunshot detection on the saved file, pass the GPS data to the prediction function
+        results = await GunshotDetector.predict_gunshot(sound_file_path, gps_data)
         
         # Remove the temporary file after prediction is done
         os.remove(sound_file_path)  
