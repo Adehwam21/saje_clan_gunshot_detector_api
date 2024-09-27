@@ -131,8 +131,7 @@ class GunshotDetector:
             await SajeBot.send_location(chat_id = group_chat_id, 
                                         latitude= GPS_data['lat'], 
                                         longitude = GPS_data['lng'], 
-                                        horizontal_accuracy= 40, 
-                                        proximity_alert_radius= 40
+                                        horizontal_accuracy= 30, 
                                         )
             
             return message  # Return the message that was sent
