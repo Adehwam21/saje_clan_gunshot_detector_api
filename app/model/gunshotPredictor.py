@@ -1,26 +1,23 @@
 import os
-import sys
 import pandas as pd
 from dotenv import load_dotenv
 from pathlib import Path
 from opensoundscape.preprocess.preprocessors import AudioToSpectrogramPreprocessor
 from opensoundscape.torch.models.cnn import Resnet18Binary
 from app.utils import format_gps_data
-from telegram import Bot
+from telegram import Bot, Update
+from telegram.ext import Application, CommandHandler, MessageHandler, filters
 
 # Load environment variables from the .env file
 load_dotenv()
 
 # Retrieve the bot token and group chat ID from environment variables
 bot_token = os.environ.get("TELEGRAM_SAJE_BOT_TOKEN")
-id = os.environ.get("TELEGRAM_ANTI_POACHING_GROUP_CHAT_ID")
-
+group_chat_id = os.environ.get("TELEGRAM_ANTI_POACHING_GROUP_CHAT_ID")
 
 # Raise an error if the bot token or chat ID are not found in the environment variables
-if not bot_token or not id:
+if not bot_token or not group_chat_id:
     raise EnvironmentError("Bot token or chat ID not found in environment variables.")
-
-
 
 class GunshotDetector:
     """A class responsible for detecting gunshots and notifying a Telegram group."""
@@ -28,7 +25,7 @@ class GunshotDetector:
     # Static variables for the model and the Telegram bot
     model = None
     bot = Bot(token=bot_token)  # Initialize the bot with the token from the environment
-    group_chat_id = id  # Set the group chat ID from the environment
+    group_chat_id = group_chat_id  # Set the group chat ID from the environment
 
     @staticmethod
     def load_model(model_path):
@@ -138,3 +135,29 @@ class GunshotDetector:
         else:
             # If no gunshot is detected, return a message indicating low probability
             return f"No Gunshot detected. Probability: {round(positive_score * 100, 2)}%"
+
+#     @staticmethod
+#     def handle_message(update: Update, context):
+#         """Send a descriptive message when the bot receives any message."""
+#         message = (
+#             "Hello! I am the Wildlife Rescue Team Bot.\n"
+#             "I help in detecting gunshots and notifying the team.\n"
+#             "Whenever a gunshot is detected, I will send a message with the probability, "
+#             "date, time, and location of the event."
+#         )
+#         context.bot.send_message(chat_id=update.effective_chat.id, text=message)
+
+# # Set up the bot and dispatcher
+# def main() -> None:
+#     """Start the bot."""
+#     # Create the Application and pass it your bot's token.
+#     application = Application.builder().token(bot_token).build()
+
+#     # Add a message handler to respond to any incoming message
+#     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, GunshotDetector.handle_message))
+
+#     # Run the bot until the user presses Ctrl-C
+#     application.run_polling(allowed_updates=Update.ALL_TYPES)
+
+# if __name__ == "__main__":
+#     main()
