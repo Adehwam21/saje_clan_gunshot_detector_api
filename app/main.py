@@ -7,6 +7,8 @@ import os
 # Initialize FastAPI app
 app = FastAPI()
 
+port = int(os.getenv("PORT", 8000))
+
 # Try to load the pre-trained gunshot detection model at startup
 try:
     GunshotDetector.load_model("app/model/best.model")
@@ -64,3 +66,11 @@ async def detect_gunshot(file: UploadFile = File(...), gps_data: str = Header(No
     except Exception as e:
         # Return a JSON response with an error message and a 500 status code in case of an exception
         return JSONResponse(content={"error": str(e)}, status_code=500)
+
+
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=port)
+
