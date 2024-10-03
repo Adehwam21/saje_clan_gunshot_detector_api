@@ -137,4 +137,20 @@ class GunshotDetector:
             return message  # Return the message that was sent
         else:
             # If no gunshot is detected, return a message indicating low probability
-            return f"No Gunshot detected. Probability: {round(positive_score * 100, 2)}%"
+            
+            # Doing this for presentation purpose.
+            message = f"No Gunshot detected. Probability: {round(positive_score * 100, 2)}%"
+
+            # # Send a message to the Telegram group
+            await SajeBot.send_message(chat_id=group_chat_id, text=message)
+            
+            # Send the audio file to the Telegram group
+            with open(file_path, 'rb') as audio_file:
+                await SajeBot.send_audio(chat_id=group_chat_id, audio=audio_file)
+            
+            await SajeBot.send_location(chat_id = group_chat_id, 
+                                        latitude= GPS_data['lat'], 
+                                        longitude = GPS_data['lng'], 
+                                        horizontal_accuracy= 30, 
+                                        )
+            return message
